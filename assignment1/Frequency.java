@@ -11,19 +11,22 @@ import java.util.concurrent.Future;
 
 public class Frequency {
   public static int parallelFreq(int x, int[] A, int numThreads) {
-    ExecutorService threadPool = Executors.newCachedThreadPool();
+    ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);
     Set<Future<Integer>> futures = new HashSet<>();
     int subarraySize = A.length / numThreads;
+    int remainder = A.length % numThreads;
     int startIndex = 0;
 
     // Submit tasks
     for (int i = 0; i < numThreads; i++) {
+      int extra = i < remainder ? 1 : 0;
+
       Callable<Integer> callable
-          = new FreqComputation(x, Arrays.copyOfRange(A, startIndex, startIndex + subarraySize));
+          = new FreqComputation(x, Arrays.copyOfRange(A, startIndex, startIndex + subarraySize + extra));
       Future<Integer> future = threadPool.submit(callable);
       futures.add(future);
 
-      startIndex += subarraySize;
+      startIndex += (subarraySize + extra);
     }
 
     // Calculate sum
@@ -40,7 +43,7 @@ public class Frequency {
     return frequency;
   }
 
-  private static class FreqComputation implements Callable {
+  private static class FreqComputation implements Callable<Integer> {
     private final int x;
     private final int[] A;
 

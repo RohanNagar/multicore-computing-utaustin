@@ -2,6 +2,22 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
+#include <omp.h>
+
+void read_matrix(std::string filename, double* A, int m, int n) {
+
+}
+
+// Print matrix A
+void print_matrix(double* A, int m, int n) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            std::cout << A[i*m+j] << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+}
 
 int main(int argc, char* argv[]) {
     if (argc <= 3) {
@@ -24,6 +40,18 @@ int main(int argc, char* argv[]) {
         num_threads = 1;
     }
 
+    // Read in matricies
+    //read_matrix(file1, ...);
+    //read_matrix(file2, ...);
+
+    // Samples
+    //int n = 3;
+    //int m = 3;
+    //double* A = (double*) malloc(sizeof(double)*m*n);
+    //double* A2 = (double*) malloc(sizeof(double)*m*n);
+    //for(int i = 0; i < m*n; i++) {
+    //    A[i] = 1.0*rand()/RAND_MAX;
+    // }
 
 }
 

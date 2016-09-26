@@ -88,7 +88,6 @@ int main(int argc, char* argv[]) {
     double dtime = omp_get_wtime();
     #pragma omp parallel
     {
-        std::cout << "Num Threads: " << omp_get_num_threads() << "\n";
         int i, j, k;
         #pragma omp for
         for (i = 0; i < A_mat.size(); i++) {

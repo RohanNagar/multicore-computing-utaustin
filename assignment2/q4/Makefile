@@ -1,2 +1,2 @@
 build:
-	g++ matrix.cpp -o matrix
+	g++ matrix.cpp -o matrix -fopenmp

@@ -1,18 +1,17 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sstream>
 #include <cstdlib>
+#include <vector>
 #include <omp.h>
-
-void read_matrix(std::string filename, double* A, int m, int n) {
-
-}
+#include <time.h>
 
 // Print matrix A
-void print_matrix(double* A, int m, int n) {
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            std::cout << A[i*m+j] << " ";
+void print_matrix(const std::vector<std::vector<int> >& A_mat, int m, int n) {
+    for (int k = 0; k < A_mat.size(); k++) {
+        for (int l = 0; l < A_mat[k].size(); l++) {
+            std::cout << A_mat[k][l] << " ";
         }
         std::cout << "\n";
     }
@@ -40,19 +39,80 @@ int main(int argc, char* argv[]) {
         num_threads = 1;
     }
 
+    omp_set_num_threads(num_threads);
+
     // Read in matricies
-    //read_matrix(file1, ...);
-    //read_matrix(file2, ...);
+    int n1;
+    int m1;
+    std::ifstream file;
+    file.open(file1.c_str());
+    
+    file >> m1 >> n1;
+    std::vector<std::vector<int> > A_mat(m1);
 
-    // Samples
-    //int n = 3;
-    //int m = 3;
-    //double* A = (double*) malloc(sizeof(double)*m*n);
-    //double* A2 = (double*) malloc(sizeof(double)*m*n);
-    //for(int i = 0; i < m*n; i++) {
-    //    A[i] = 1.0*rand()/RAND_MAX;
-    // }
+    int num;
+    for (int i = 0; i < m1; i++) {
+        std::vector<int> row(n1);
+        for (int j = 0; j < n1; j++) {
+            file >> num;
+            row[j] = num;
+        }
+        A_mat[i] = row;
+    }
 
+    file.close();
+    
+    int n2;
+    int m2;
+    file.open(file2.c_str());
+    file >> m2 >> n2;
+    std::vector<std::vector<int> > B_mat(m2);
+
+    for (int i = 0; i < m2; i++) {
+        std::vector<int> row(n2);
+        for (int j = 0; j < n2; j++) {
+            file >> num;
+            row[j] = num;
+        }
+        B_mat[i] = row;
+    }
+
+    file.close();
+
+    std::vector<std::vector<int> > C_mat(m1);
+    for (int i = 0; i < C_mat.size(); i++) {
+        std::vector<int> row(n2);
+        C_mat[i] = row;
+    }
+   
+    double dtime = omp_get_wtime();
+    #pragma omp parallel
+    {
+        std::cout << "Num Threads: " << omp_get_num_threads() << "\n";
+        int i, j, k;
+        #pragma omp for
+        for (i = 0; i < A_mat.size(); i++) {
+            std::vector<int> row = A_mat[i];
+            for (j = 0; j < n2; j++) {
+                std::vector<int> col(m2);
+                for (k = 0; k < m2; k++) {
+                    col[k] = B_mat[k][j];
+                }
+
+                // Dot product
+                int prod = 0;
+                for (k = 0; k < row.size(); k++) {
+                    prod += row[k]*col[k];
+                }
+                C_mat[i][j] = prod;
+            }
+        }
+    }
+    dtime = omp_get_wtime() - dtime;
+    std::cout << "Time: " << dtime << "\n";
+
+    std::cout << m1 << " " << n2 << "\n";
+    print_matrix(C_mat, m1, n2);
 }
 
 

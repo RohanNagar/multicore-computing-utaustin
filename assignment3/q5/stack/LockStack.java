@@ -27,12 +27,16 @@ AtomicInteger count;
 		  count.incrementAndGet();
 		  //condition.signal();
 		  
-	  } catch (Exception e){e.printStackTrace(System.out);}
+	  }catch(OutOfMemoryError e)
+	  {
+		  return false;
+	  }
+	  catch (Exception e){e.printStackTrace(System.out);}
 	  finally
 	  {
 		  topLock.unlock();
 	  }
-	  return false;
+	  return true;
   }
   
   public Integer pop() throws EmptyStack {

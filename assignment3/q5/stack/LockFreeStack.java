@@ -17,20 +17,26 @@ AtomicReference<Node> top;
 	  // implement your push method here
 	  
 	  Node nodeToPush = new Node(value);
-	  
-	  while(true)
+	  try
 	  {
-		  Node oldTop = top.get();
-		  nodeToPush.next = oldTop;
-		  if(top.compareAndSet(oldTop, nodeToPush))
+		  while(true)
 		  {
-			  return true;
+			  Node oldTop = top.get();
+			  nodeToPush.next = oldTop;
+			  if(top.compareAndSet(oldTop, nodeToPush))
+			  {
+				  return true;
+			  }
+			  else
+			  {
+				  Thread.yield();
+			  }
 		  }
-		  else
-		  {
-			  Thread.yield();
-		  }
+	  }catch (OutOfMemoryError e)
+	  {
+		  return false;
 	  }
+	  
   }
   
   public Integer pop() throws EmptyStack {

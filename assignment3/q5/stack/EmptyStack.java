@@ -1,4 +1,4 @@
-package stack;
+package q5b;
 
 // This is the exception throwed when try to pop an
 // element from an empty stack.

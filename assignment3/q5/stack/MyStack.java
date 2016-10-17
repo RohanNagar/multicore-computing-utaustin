@@ -1,7 +1,7 @@
 // You do NOT need to modify this file
 // The interface of the MyStack
 // You should implement LockStack and LockFreeStack by extending this class
-package stack;
+package q5b;
 
 public interface MyStack {
 	// return true if successfully push a new value

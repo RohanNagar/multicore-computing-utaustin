@@ -75,11 +75,13 @@ void reduce(int * d_out, int * d_intermediate, int * d_in,
 }
 
 // PART B
-__global__ void partb(int* d_out, int* d_in) {
+__global__ void partb(int* d_out, int* d_in, int size) {
   int myId = threadIdx.x + blockDim.x * blockIdx.x;
 
-  int f = d_in[myId];
-  d_out[myId] = f % 10;
+  if (myId < size) {
+    int f = d_in[myId];
+    d_out[myId] = f % 10;
+  }
 }
 
 int main(int argc, char ** argv) {
@@ -171,7 +173,7 @@ int main(int argc, char ** argv) {
   const int maxThreadsPerBlock = 1024; //increased from 512 to 1024 to handle 1024^2 values
   int threads = maxThreadsPerBlock;
   int blocks = (a->size + (maxThreadsPerBlock-1)) / maxThreadsPerBlock;
-  partb<<<blocks, threads>>>(d_out_b, d_in_b);
+  partb<<<blocks, threads>>>(d_out_b, d_in_b, a->size);
   
   cudaEventSynchronize(stop);
   float elapsedTime;

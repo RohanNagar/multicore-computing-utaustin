@@ -54,24 +54,20 @@ void reduce(int * d_out, int * d_intermediate, int * d_in,
     const int maxThreadsPerBlock = 1024; //increased from 512 to 1024 to handle 1024^2 values
     int threads = maxThreadsPerBlock;
     int blocks = (size + (maxThreadsPerBlock-1)) / maxThreadsPerBlock;
-    if (usesSharedMemory) {
-        //shmem_reduce_kernel<<<blocks, threads, threads * sizeof(int)>>>
-            //(d_intermediate, d_in, size);
-    } else {
-        global_reduce_kernel<<<blocks, threads>>>
-            (d_intermediate, d_in, size);
+    global_reduce_kernel<<<blocks, threads>>>
+        (d_intermediate, d_in, size);
+
+    int powerOfTwo = 1;
+    while (powerOfTwo < blocks) {
+      powerOfTwo *= 2;
     }
 
     // now we're down to one block left, so reduce it
-    threads = blocks; // launch one thread for each block in prev step
+    int newSize = blocks;
+    threads = powerOfTwo; // launch one thread for each block in prev step
     blocks = 1;
-    if (usesSharedMemory) {
-        //shmem_reduce_kernel<<<blocks, threads, threads * sizeof(int)>>>
-            //(d_out, d_intermediate);
-    } else {
-        global_reduce_kernel<<<blocks, threads>>>
-            (d_out, d_intermediate, size);
-    }
+    global_reduce_kernel<<<blocks, threads>>>
+        (d_out, d_intermediate, newSize);
 }
 
 // PART B
@@ -100,8 +96,6 @@ int main(int argc, char ** argv) {
     exit(-1);
   }
   char separators[] = " ,";
-  char number[7];
-  //int num;
   char buf[100];
   char* token;
   int offset = 0;

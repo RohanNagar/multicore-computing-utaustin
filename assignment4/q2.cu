@@ -35,7 +35,7 @@ __global__ void global_reduce_kernel(int * d_out, int * d_in, int * d_intermedia
 	if(phaseOne)
 	{
 		int index = d_in[myId] / 100;
-		printf("block dim: %d\n", blockDim.x);
+		//printf("block dim: %d\n", blockDim.x);
 		d_intermediate[myId*NUM_BUCKETS + index] = 1;
 		//printf("index: %d value: %d\n", myId*NUM_BUCKETS + index, d_in[myId] );
 		__syncthreads(); //every thread computes its bucket for number
@@ -209,11 +209,7 @@ int main(int argc, char **argv)
 	cudaDeviceProp devProps;
     if (cudaGetDeviceProperties(&devProps, dev) == 0)
     {
-        printf("Using device %d:\n", dev);
-        printf("%s; global mem: %dB; compute v%d.%d; clock: %d kHz\n",
-               devProps.name, (int)devProps.totalGlobalMem,
-               (int)devProps.major, (int)devProps.minor,
-               (int)devProps.clockRate);
+        
     }
 
 	FILE *fp;
@@ -255,7 +251,7 @@ int main(int argc, char **argv)
 	bucketize(a, b);
 	for(int i = 0; i < NUM_BUCKETS; i++)
 	{
-		printf("index: %d count: %d\n", i, b[i]);
+		//printf("index: %d count: %d\n", i, b[i]);
 	}
 	
 	const int ARRAY_BYTES = sizeof(int) * a->size;
@@ -351,7 +347,7 @@ int main(int argc, char **argv)
 	fclose(outFp);
 	
 	/***********************debug parallel prefix sum*********************/
-	printf("parallel prefix sum cpu: ");
+	//printf("parallel prefix sum cpu: ");
 	vector * wrapper = (vector*) malloc(sizeof(vector));
 	int_vector_init(wrapper);
 	for (int i = 0; i < NUM_BUCKETS; i++)
@@ -360,12 +356,12 @@ int main(int argc, char **argv)
 	}
 	int cpu_prefix_out[10] = {0};
 	prefixSum(wrapper, cpu_prefix_out);
-	printf("%d", cpu_prefix_out[0]);
+	//printf("%d", cpu_prefix_out[0]);
 	for(int i = 1; i < NUM_BUCKETS; i++)
 	{
-		printf( ", %d", cpu_prefix_out[i]);
+		//printf( ", %d", cpu_prefix_out[i]);
 	}
-	printf("\n");
+	//printf("\n");
 	
 	/************************write to q2c.txt***********************************/
 	
